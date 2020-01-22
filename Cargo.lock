@@ -568,15 +568,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "hellorsut"
-version = "0.1.0"
-dependencies = [
- "rltk",
- "specs",
- "specs-derive",
-]
-
-[[package]]
 name = "hermit-abi"
 version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1171,6 +1162,15 @@ name = "regex-syntax"
 version = "0.6.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e734e891f5b408a29efbf8309e656876276f49ab6a6ac208600b4419bd893d90"
+
+[[package]]
+name = "rltk"
+version = "0.1.0"
+dependencies = [
+ "rltk 0.5.17",
+ "specs",
+ "specs-derive",
+]
 
 [[package]]
 name = "rltk"

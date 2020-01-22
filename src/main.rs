@@ -22,21 +22,9 @@ struct Renderable {
 #[derive(Component, Debug)]
 struct Player {}
 
-#[derive(Component)]
-struct LeftMover {}
-
-struct LeftWalker {}
-
-impl<'a> System<'a> for LeftWalker {
-    type SystemData = (ReadStorage<'a, LeftMover>,
-                        WriteStorage<'a, Position>);
-    
-    fn run(&mut self, (lefty, mut pos) : Self::SystemData) {
-        for (_lefty, pos) in (&lefty, &mut pos).join() {
-            pos.x -= 1;
-            if pos.x < 0 { pos.x = 79; }
-        }
-    }
+#[derive(PartialEq, Copy, Clone)]
+enum TileType {
+    Wall, Floor
 }
 
 struct State {
@@ -62,10 +50,18 @@ impl GameState for State {
 
 impl State {
     fn run_systems(&mut self) {
-        let mut lw = LeftWalker{};
-        lw.run_now(&self.ecs);
         self.ecs.maintain();
     }
+}
+
+pub fn xy_idx(x: i32, y: i32) -> usize {
+    (y as usize * 80) + x as usize
+}
+
+fn new_map() -> Vec<TileType> {
+    let mut map = vec![TileType::Floor; 80 * 50];
+
+    map
 }
 
 fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
@@ -92,13 +88,12 @@ fn player_input(gs: &mut State, ctx: &mut Rltk) {
 }
 
 fn main() {
-    let context = Rltk::init_simple8x8(80, 50, "Hello Rust World", "resources");
+    let context = Rltk::init_simple8x8(80, 50, "Zork", "resources");
     let mut gs = State {
         ecs: World::new()
     };
     gs.ecs.register::<Position>();
     gs.ecs.register::<Renderable>();
-    gs.ecs.register::<LeftMover>();
     gs.ecs.register::<Player>();
 
     // Player
@@ -112,20 +107,6 @@ fn main() {
         })
         .with(Player{})
         .build();
-    
-    // Enemy
-    for i in 0..10 {
-        gs.ecs
-        .create_entity()
-        .with(Position { x: i * 7, y: 20 })
-        .with(Renderable {
-            glyph: rltk::to_cp437('木'),
-            fg: RGB::named(rltk::RED),
-            bg: RGB::named(rltk::WHITE),
-        })
-        .with(LeftMover{})
-        .build();
-    }
 
     rltk::main_loop(context, gs);
 }
